@@ -11,7 +11,21 @@ namespace LDAPAuth
     {
         protected void Page_Load(object sender, EventArgs e)
         {
+            divMain.Visible = false;
+            divLogin.Visible = true;
+        }
 
+        protected void btnLogin_Click(object sender, EventArgs e)
+        {
+            Dictionary<string, string[]> attributes = new Dictionary<string, string[]>();
+            string[] testAttributeValues = { "student", "member" };
+            attributes.Add("edupersonaffiliation", testAttributeValues);
+
+            rptAttributes.DataSource = attributes;
+            rptAttributes.DataBind();
+
+            divLogin.Visible = false;
+            divMain.Visible = true;
         }
     }
 }

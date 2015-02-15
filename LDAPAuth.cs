@@ -7,11 +7,12 @@
  * 3. Use the search bar on the top right corner of the 'Reference Manager' window to search for 'directory'.
  * 4. From the search results, checkmark 'System.DirectoryServices' and 'System.DirectoryServices.Protocols'.
  * 5. Click 'Ok' at the bottom fo the window to finish.
+ * 6. Add 'using System.Collections.Generic;' to top of the C# code which you wish to use this class in.
  * 
- * Usage:
- *  Add 'using System.Collections.Generic;' to top of the C# code which you wish to use this class in.
- *  Declaration:    LDAPAuth auth = new LDAPAuth(username, password);
- *  Methods for login:
+ * Declaration:
+ *      LDAPAuth auth = new LDAPAuth(username, password);
+ * 
+ * Methods:
  *      - TryLogin()
  *          Simply login without any verification of attributes. If the entered tuaccessnet username and password
  *          is correct, this type of login will succeed.
