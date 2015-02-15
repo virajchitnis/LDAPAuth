@@ -46,6 +46,7 @@
                         <asp:TextBox ID="txtPassword" runat="server" CssClass="form-control" placeholder="Enter password" TextMode="Password"></asp:TextBox>
                     </div>
                     <asp:Button ID="btnLogin" runat="server" Text="Login" CssClass="btn btn-primary" Style="float: right;" OnClick="btnLogin_Click" />
+                    <asp:Label ID="lblError" runat="server" Text="" style="clear: both; width: 100%; text-align: center;"></asp:Label>
                 </div>
             </div>
             <div style="width: 100%; text-align: center; position: fixed; bottom: 0; left: 0;">
@@ -65,18 +66,22 @@
                 </div>
                 <div class="panel-body">
                     <table class="table table-striped table-hover">
-                        <tr>
-                            <th>Key</th>
-                            <th>Values</th>
-                        </tr>
-                        <asp:Repeater ID="rptAttributes" runat="server">
-                            <ItemTemplate>
-                                <tr>
-                                    <td><%# DataBinder.Eval((System.Collections.Generic.KeyValuePair<string, string[]>)Container.DataItem,"Key") %></td>
-                                    <td><%# DataBinder.Eval((System.Collections.Generic.KeyValuePair<string, string[]>)Container.DataItem,"Value") %></td>
-                                </tr>
-                            </ItemTemplate>
-                        </asp:Repeater>
+                        <thead>
+                            <tr>
+                                <th>Key</th>
+                                <th>Values</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <asp:Repeater ID="rptAttributes" runat="server">
+                                <ItemTemplate>
+                                    <tr>
+                                        <td><%# DataBinder.Eval((System.Collections.Generic.KeyValuePair<string, string>)Container.DataItem,"Key") %></td>
+                                        <td><%# DataBinder.Eval((System.Collections.Generic.KeyValuePair<string, string>)Container.DataItem,"Value") %></td>
+                                    </tr>
+                                </ItemTemplate>
+                            </asp:Repeater>
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -89,11 +94,16 @@
                     <h3>Setup</h3>
                     <p>
                         1. Add this class to your project and change its 'namespace' to match your namespace (usually same as project name).
-                        <br />2. Right click on you project in the solution explorer and select 'Add Reference...'.
-                        <br />3. Use the search bar on the top right corner of the 'Reference Manager' window to search for 'directory'.
-                        <br />4. From the search results, checkmark 'System.DirectoryServices' and 'System.DirectoryServices.Protocols'.
-                        <br />5. Click 'Ok' at the bottom fo the window to finish.
-                        <br />6. Add 'using System.Collections.Generic;' to top of the C# code which you wish to use this class in.
+                        <br />
+                        2. Right click on you project in the solution explorer and select 'Add Reference...'.
+                        <br />
+                        3. Use the search bar on the top right corner of the 'Reference Manager' window to search for 'directory'.
+                        <br />
+                        4. From the search results, checkmark 'System.DirectoryServices' and 'System.DirectoryServices.Protocols'.
+                        <br />
+                        5. Click 'Ok' at the bottom fo the window to finish.
+                        <br />
+                        6. Add 'using System.Collections.Generic;' to top of the C# code which you wish to use this class in.
                     </p>
                     <h3>Declaration</h3>
                     <pre><code>LDAPAuth auth = new LDAPAuth(username, password);</code></pre>
@@ -101,7 +111,7 @@
                     <h4>TryLogin()*</h4>
                     <p>Simply login without any verification of attributes. If the entered tuaccessnet username and password is correct, this type of login will succeed.</p>
                     <pre><code>string successOrNot = auth.TryLogin();</code></pre>
-                    <h4>TryLogin(Dictionary<string, string[]> LDAPFieldsAndValuesToVerify)*</h4>
+                    <h4 id="tryLoginWithParaHeader"></h4>
                     <p>
                         This method accepts a dictionary of fields and values that should be verified before successfule login.
                         If on the of provided fields does not exists, the login fails.
@@ -127,11 +137,14 @@
         </div>
     </form>
 
-	<script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function () {
+            var tryLoginWithParaHeader = "TryLogin(Dictionary<string, string[]> LDAPFieldsAndValuesToVerify)*";
+            $("#tryLoginWithParaHeader").text(tryLoginWithParaHeader);
+
             var tryLoginCode = "Dictionary<string, string[]> fieldsToCheck = new Dictionary<string, string[]>(); // Declare dictionary"
                 + "\nstring[] edupersonaffiliation = { \"student\", \"member\" }; // Array of values for field 'edupersonaffiliation'"
                 + "\nfieldsToCheck.Add(\"edupersonaffiliation\", edupersonaffiliation); // Add field and value to dictionary"
