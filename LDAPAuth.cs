@@ -10,7 +10,7 @@
  * 
  * Usage:
  *  Add 'using System.Collections.Generic;' to top of the C# code which you wish to use this class in.
- *  Declaration:    Authentication auth = new Authentication(username, password);
+ *  Declaration:    LDAPAuth auth = new LDAPAuth(username, password);
  *  Methods for login:
  *      - TryLogin()
  *          Simply login without any verification of attributes. If the entered tuaccessnet username and password
@@ -23,14 +23,14 @@
  *              Dictionary<string, string[]> fieldsToCheck = new Dictionary<string, string[]>(); // Declare dictionary
  *              string[] edupersonaffiliation = { "student", "member" }; // Array of values for field 'edupersonaffiliation'
  *              fieldsToCheck.Add("edupersonaffiliation", edupersonaffiliation); // Add field and value to dictionary
- *              string successOrNot = login.TryLogin(fieldsToCheck); // Call TryLogin method with dictionary as parameter
+ *              string successOrNot = auth.TryLogin(fieldsToCheck); // Call TryLogin method with dictionary as parameter
  *      Both the above methods return 'success' for successful logins, and 'failure' for failed logins.
  *      - TryLoginAndGetAllAttributes()
  *          Simply login without any verification of attributes. If the entered tuaccessnet username and password
  *          is correct, this type of login will succeed. This method also returns all the LDAP attributes of the user as a
  *          dictionary that can be used in your code as you see fit.
  *          Example usage:
- *              Dictionary<string, string[]> LDAPAttributes = login.TryLoginAndGetAllAttributes();
+ *              Dictionary<string, string[]> LDAPAttributes = auth.TryLoginAndGetAllAttributes();
  */
 
 using System;
