@@ -33,10 +33,6 @@ namespace LDAPAuth
             LDAPAuth auth = new LDAPAuth(txtUsername.Text, txtPassword.Text);
             Dictionary<string, string[]> attributes = auth.TryLoginAndGetAllAttributes(out errMessage);
 
-            //Dictionary<string, string[]> attributes = new Dictionary<string, string[]>();
-            //string[] testAttributeValues = { "student", "member" };
-            //attributes.Add("edupersonaffiliation", testAttributeValues);
-
             if (attributes.Count > 0)
             {
                 Dictionary<string, string> repeaterData = new Dictionary<string, string>();

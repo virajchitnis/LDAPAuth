@@ -1,4 +1,4 @@
-﻿/* Authentication class for logging into Temple University systems using LDAP.
+﻿/* LDAPAuth class for logging into Temple University systems using LDAP.
  * Copyright (c) 2015 Viraj Chitnis. All Rights Reserved.
  * 
  * Setup:
