@@ -56,7 +56,7 @@
 
         <div id="divMain" class="container-fluid" runat="server">
             <div class="page-header">
-                <a class="btn btn-success" href="LDAPAuth.cs" role="button" style="float: right;" download><span class="glyphicon glyphicon-download" aria-hidden="true"></span>&nbsp;Download LDAPAuth.cs</a>
+                <a class="btn btn-success" href="https://raw.githubusercontent.com/virajchitnis/LDAPAuth/master/LDAPAuth.cs" role="button" style="float: right;" download><span class="glyphicon glyphicon-download" aria-hidden="true"></span>&nbsp;Download LDAPAuth.cs</a>
                 <h1>LDAPAuth.cs <small>by Viraj Chitnis</small></h1>
             </div>
 
@@ -105,12 +105,21 @@
                         <br />
                         6. Add 'using System.Collections.Generic;' to top of the C# code which you wish to use this class in.
                     </p>
+                    <br />
                     <h3>Declaration</h3>
                     <pre><code>LDAPAuth auth = new LDAPAuth(username, password);</code></pre>
+                    <br />
                     <h3>Methods</h3>
-                    <h4>TryLogin()*</h4>
+                    <p>
+                        All methods take a reference to a string variable as a parameter. If there is an error during the LDAP connection,
+                        the error message will be put into this variable. You may use this error message in your implementation of LDAPAuth.cs
+                        as you see fit.
+                    </p>
+                    <br />
+                    <h4>TryLogin(out string errMessage)*</h4>
                     <p>Simply login without any verification of attributes. If the entered tuaccessnet username and password is correct, this type of login will succeed.</p>
-                    <pre><code>string successOrNot = auth.TryLogin();</code></pre>
+                    <pre><code id="tryLoginWithoutParaCode"></code></pre>
+                    <br />
                     <h4 id="tryLoginWithParaHeader"></h4>
                     <p>
                         This method accepts a dictionary of fields and values that should be verified before successfule login.
@@ -118,13 +127,15 @@
                         As long as at least one of the value provided for each field matches, the login is successful.
                     </p>
                     <pre><code id="tryLoginCode"></code></pre>
-                    <h4>TryLoginAndGetAllAttributes()</h4>
+                    <br />
+                    <h4>TryLoginAndGetAllAttributes(out string errMessage)</h4>
                     <p>
                         Simply login without any verification of attributes. If the entered tuaccessnet username and password
                         is correct, this type of login will succeed. This method also returns all the LDAP attributes of the user as a
                         dictionary that can be used in your code as you see fit.
                     </p>
                     <pre><code id="tryLoginAndGetAllAttributesCode"></code></pre>
+                    <br />
                     <hr />
                     <h5><small>* Method returns 'success' for successful logins, and 'failure' for failed logins.</small></h5>
                 </div>
@@ -142,16 +153,21 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function () {
-            var tryLoginWithParaHeader = "TryLogin(Dictionary<string, string[]> LDAPFieldsAndValuesToVerify)*";
+            var tryLoginWithoutParaCode = "string errMessage = \"\"; // If there is an error, the error message will be put into this variable\nstring successOrNot = auth.TryLogin(out errMessage);";
+            $("#tryLoginWithoutParaCode").text(tryLoginWithoutParaCode);
+
+            var tryLoginWithParaHeader = "TryLogin(Dictionary<string, string[]> LDAPFieldsAndValuesToVerify, out string errMessage)*";
             $("#tryLoginWithParaHeader").text(tryLoginWithParaHeader);
 
-            var tryLoginCode = "Dictionary<string, string[]> fieldsToCheck = new Dictionary<string, string[]>(); // Declare dictionary"
+            var tryLoginCode = "string errMessage = \"\"; // If there is an error, the error message will be put into this variable\n"
+                + "Dictionary<string, string[]> fieldsToCheck = new Dictionary<string, string[]>(); // Declare dictionary"
                 + "\nstring[] edupersonaffiliation = { \"student\", \"member\" }; // Array of values for field 'edupersonaffiliation'"
                 + "\nfieldsToCheck.Add(\"edupersonaffiliation\", edupersonaffiliation); // Add field and value to dictionary"
-                + "\nstring successOrNot = auth.TryLogin(fieldsToCheck); // Call TryLogin method with dictionary as parameter";
+                + "\nstring successOrNot = auth.TryLogin(fieldsToCheck, out errMessage); // Call TryLogin method with dictionary as parameter";
             $("#tryLoginCode").text(tryLoginCode);
 
-            var tryLoginAndGetAllAttributesCode = "Dictionary<string, string[]> LDAPAttributes = auth.TryLoginAndGetAllAttributes();";
+            var tryLoginAndGetAllAttributesCode = "string errMessage = \"\"; // If there is an error, the error message will be put into this variable\n"
+                + "Dictionary<string, string[]> LDAPAttributes = auth.TryLoginAndGetAllAttributes(out errMessage);";
             $("#tryLoginAndGetAllAttributesCode").text(tryLoginAndGetAllAttributesCode);
 
             $('pre code').each(function (i, block) {

@@ -29,12 +29,13 @@ namespace LDAPAuth
                 return;
             }
 
-            //LDAPAuth auth = new LDAPAuth(txtUsername.Text, txtPassword.Text);
-            //Dictionary<string, string[]> attributes = auth.TryLoginAndGetAllAttributes();
+            string errMessage = "";
+            LDAPAuth auth = new LDAPAuth(txtUsername.Text, txtPassword.Text);
+            Dictionary<string, string[]> attributes = auth.TryLoginAndGetAllAttributes(out errMessage);
 
-            Dictionary<string, string[]> attributes = new Dictionary<string, string[]>();
-            string[] testAttributeValues = { "student", "member" };
-            attributes.Add("edupersonaffiliation", testAttributeValues);
+            //Dictionary<string, string[]> attributes = new Dictionary<string, string[]>();
+            //string[] testAttributeValues = { "student", "member" };
+            //attributes.Add("edupersonaffiliation", testAttributeValues);
 
             if (attributes.Count > 0)
             {
@@ -53,7 +54,14 @@ namespace LDAPAuth
             }
             else
             {
-                lblError.Text = "Invalid username or password";
+                if (errMessage != "success")
+                {
+                    lblError.Text = errMessage;
+                }
+                else
+                {
+                    lblError.Text = "Invalid username or password";
+                }
             }
         }
 

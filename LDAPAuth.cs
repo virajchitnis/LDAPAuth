@@ -13,25 +13,33 @@
  *      LDAPAuth auth = new LDAPAuth(username, password);
  * 
  * Methods:
- *      - TryLogin()
+ *  All methods take a reference to a string variable as a parameter. If there is an error during the LDAP connection,
+ *  the error message will be put into this variable. You may use this error message in your implementation of LDAPAuth.cs
+ *  as you see fit.
+ *      - TryLogin(out string errMessage)
  *          Simply login without any verification of attributes. If the entered tuaccessnet username and password
  *          is correct, this type of login will succeed.
- *      - TryLogin(Dictionary<string, string[]> LDAPFieldsAndValuesToVerify)
+ *          Example usage:
+ *              string errMessage = ""; // If there is an error, the error message will be put into this variable
+ *              string successOrNot = auth.TryLogin(out errMessage);
+ *      - TryLogin(Dictionary<string, string[]> LDAPFieldsAndValuesToVerify, out string errMessage)
  *          This method accepts a dictionary of fields and values that should be verified before successfule login.
  *          If on the of provided fields does not exists, the login fails.
  *          As long as at least one of the value provided for each field matches, the login is successful.
  *          Example usage:
+ *              string errMessage = ""; // If there is an error, the error message will be put into this variable
  *              Dictionary<string, string[]> fieldsToCheck = new Dictionary<string, string[]>(); // Declare dictionary
  *              string[] edupersonaffiliation = { "student", "member" }; // Array of values for field 'edupersonaffiliation'
  *              fieldsToCheck.Add("edupersonaffiliation", edupersonaffiliation); // Add field and value to dictionary
- *              string successOrNot = auth.TryLogin(fieldsToCheck); // Call TryLogin method with dictionary as parameter
+ *              string successOrNot = auth.TryLogin(fieldsToCheck, out errMessage); // Call TryLogin method with dictionary as parameter
  *      Both the above methods return 'success' for successful logins, and 'failure' for failed logins.
- *      - TryLoginAndGetAllAttributes()
+ *      - TryLoginAndGetAllAttributes(out string errMessage)
  *          Simply login without any verification of attributes. If the entered tuaccessnet username and password
  *          is correct, this type of login will succeed. This method also returns all the LDAP attributes of the user as a
  *          dictionary that can be used in your code as you see fit.
  *          Example usage:
- *              Dictionary<string, string[]> LDAPAttributes = auth.TryLoginAndGetAllAttributes();
+ *              string errMessage = ""; // If there is an error, the error message will be put into this variable
+ *              Dictionary<string, string[]> LDAPAttributes = auth.TryLoginAndGetAllAttributes(out errMessage);
  */
 
 using System;
@@ -65,9 +73,9 @@ namespace LDAPAuth
         }
 
         // Simply login without verifying any extra LDAP fields.
-        public String TryLogin()
+        public String TryLogin(out string errMessage)
         {
-            DoLoginAndGetAttributes();
+            errMessage = DoLoginAndGetAttributes();
 
             if (attributes.Count > 0)
             {
@@ -80,10 +88,10 @@ namespace LDAPAuth
         }
 
         // Verify certain LDAP field values before allowing login. This may be used to restrict logins to only TU faculty, or only TU students, etc.
-        public String TryLogin(Dictionary<string, string[]> LDAPFieldsAndValuesToVerify)
+        public String TryLogin(Dictionary<string, string[]> LDAPFieldsAndValuesToVerify, out string errMessage)
         {
             bool success = false;
-            DoLoginAndGetAttributes();
+            errMessage = DoLoginAndGetAttributes();
 
             if (attributes.Count > 0)
             {
@@ -133,17 +141,17 @@ namespace LDAPAuth
 
         // Login and get all LDAP fields and values to be used in your own code.
         // To check if login was successful, check the count of the returned dictionary object, a failed login will have 0 count.
-        public Dictionary<string, string[]> TryLoginAndGetAllAttributes()
+        public Dictionary<string, string[]> TryLoginAndGetAllAttributes(out string errMessage)
         {
-            DoLoginAndGetAttributes();
+            errMessage = DoLoginAndGetAttributes();
 
             return attributes;
         }
 
         // This method is mainly meant for testing purposes.
-        public String TryLoginAndGetValueOfAttribute(string attributeName)
+        public String TryLoginAndGetValueOfAttribute(string attributeName, out string errMessage)
         {
-            DoLoginAndGetAttributes();
+            errMessage = DoLoginAndGetAttributes();
 
             if (attributes.Count > 0)
             {
@@ -162,7 +170,7 @@ namespace LDAPAuth
             }
         }
 
-        private void DoLoginAndGetAttributes()
+        private String DoLoginAndGetAttributes()
         {
             ldapConnection = new LdapConnection(ldapServer);
             ldapConnection.SessionOptions.SecureSocketLayer = true;
@@ -171,41 +179,43 @@ namespace LDAPAuth
 
             using (ldapConnection)
             {
-                SearchRequest request = new SearchRequest(targetOU, "(uid=" + username + ")", SearchScope.Subtree);
-                SearchResponse response = (SearchResponse)ldapConnection.SendRequest(request);
-
-                string dn = "";
-                if (response.Entries.Count > 0)
-                {
-                    SearchResultEntry entry = response.Entries[0];
-                    dn = entry.DistinguishedName;
-
-                    foreach (string attributeName in entry.Attributes.AttributeNames)
-                    {
-                        string attributeValue = "";
-                        for (int i = 0; i < entry.Attributes[attributeName].Count; i++)
-                        {
-                            attributeValue = attributeValue + entry.Attributes[attributeName][i].ToString();
-
-                            if (i < (entry.Attributes[attributeName].Count - 1))
-                            {
-                                attributeValue = attributeValue + ",";
-                            }
-                        }
-
-                        attributes.Add(attributeName, attributeValue.Split(','));
-                    }
-                }
-
-                ldapConnection.Credential = new NetworkCredential(dn, password);
-
                 try
                 {
+                    SearchRequest request = new SearchRequest(targetOU, "(uid=" + username + ")", SearchScope.Subtree);
+                    SearchResponse response = (SearchResponse)ldapConnection.SendRequest(request);
+
+                    string dn = "";
+                    if (response.Entries.Count > 0)
+                    {
+                        SearchResultEntry entry = response.Entries[0];
+                        dn = entry.DistinguishedName;
+
+                        foreach (string attributeName in entry.Attributes.AttributeNames)
+                        {
+                            string attributeValue = "";
+                            for (int i = 0; i < entry.Attributes[attributeName].Count; i++)
+                            {
+                                attributeValue = attributeValue + entry.Attributes[attributeName][i].ToString();
+
+                                if (i < (entry.Attributes[attributeName].Count - 1))
+                                {
+                                    attributeValue = attributeValue + ",";
+                                }
+                            }
+
+                            attributes.Add(attributeName, attributeValue.Split(','));
+                        }
+                    }
+
+                    ldapConnection.Credential = new NetworkCredential(dn, password);
+
                     ldapConnection.Bind();
+                    return "success";
                 }
-                catch
+                catch (Exception e)
                 {
                     attributes = new Dictionary<string, string[]>();
+                    return e.Message;
                 }
             }
         }
