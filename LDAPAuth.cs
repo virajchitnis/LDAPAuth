@@ -190,27 +190,43 @@ namespace LDAPAuth
                         SearchResultEntry entry = response.Entries[0];
                         dn = entry.DistinguishedName;
 
-                        foreach (string attributeName in entry.Attributes.AttributeNames)
-                        {
-                            string attributeValue = "";
-                            for (int i = 0; i < entry.Attributes[attributeName].Count; i++)
-                            {
-                                attributeValue = attributeValue + entry.Attributes[attributeName][i].ToString();
+                        ldapConnection.Credential = new NetworkCredential(dn, password);
 
-                                if (i < (entry.Attributes[attributeName].Count - 1))
+                        ldapConnection.Bind();
+                        request = new SearchRequest(targetOU, "(uid=" + username + ")", SearchScope.Subtree);
+                        response = (SearchResponse)ldapConnection.SendRequest(request);
+
+                        if (response.Entries.Count > 0)
+                        {
+                            entry = response.Entries[0];
+
+                            foreach (string attributeName in entry.Attributes.AttributeNames)
+                            {
+                                string attributeValue = "";
+                                for (int i = 0; i < entry.Attributes[attributeName].Count; i++)
                                 {
-                                    attributeValue = attributeValue + ",";
+                                    attributeValue = attributeValue + entry.Attributes[attributeName][i].ToString();
+
+                                    if (i < (entry.Attributes[attributeName].Count - 1))
+                                    {
+                                        attributeValue = attributeValue + ",";
+                                    }
                                 }
+
+                                attributes.Add(attributeName, attributeValue.Split(','));
                             }
 
-                            attributes.Add(attributeName, attributeValue.Split(','));
+                            return "success";
+                        }
+                        else
+                        {
+                            return "failure";
                         }
                     }
-
-                    ldapConnection.Credential = new NetworkCredential(dn, password);
-
-                    ldapConnection.Bind();
-                    return "success";
+                    else
+                    {
+                        return "failure";
+                    }
                 }
                 catch (Exception e)
                 {
