@@ -236,6 +236,39 @@ namespace LDAPAuth
             }
         }
 
+        public String DoLoginAndGetDN()
+        {
+            ldapConnection = new LdapConnection(ldapServer);
+            ldapConnection.SessionOptions.SecureSocketLayer = true;
+            ldapConnection.AuthType = AuthType.Basic;
+            ldapConnection.Credential = new NetworkCredential(String.Empty, String.Empty);
+
+            using (ldapConnection)
+            {
+                try
+                {
+                    SearchRequest request = new SearchRequest(targetOU, "(uid=" + username + ")", SearchScope.Subtree);
+                    SearchResponse response = (SearchResponse)ldapConnection.SendRequest(request);
+
+                    string dn = "";
+                    if (response.Entries.Count > 0)
+                    {
+                        SearchResultEntry entry = response.Entries[0];
+                        return dn = entry.DistinguishedName;
+                    }
+                    else
+                    {
+                        return "Username not found.";
+                    }
+                }
+                catch (Exception e)
+                {
+                    attributes = new Dictionary<string, string[]>();
+                    return e.Message;
+                }
+            }
+        }
+
         private String arrayToString(string[] arr)
         {
             string ret = string.Join(",", arr);

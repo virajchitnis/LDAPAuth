@@ -29,36 +29,37 @@ namespace LDAPAuth
                 return;
             }
 
-            string errMessage = "";
+            //string errMessage = "";
             LDAPAuth auth = new LDAPAuth(txtUsername.Text, txtPassword.Text);
-            Dictionary<string, string[]> attributes = auth.TryLoginAndGetAllAttributes(out errMessage);
+            lblError.Text = auth.DoLoginAndGetDN();
+            //Dictionary<string, string[]> attributes = auth.TryLoginAndGetAllAttributes(out errMessage);
 
-            if (attributes.Count > 0)
-            {
-                Dictionary<string, string> repeaterData = new Dictionary<string, string>();
-                foreach (KeyValuePair<string, string[]> attribute in attributes)
-                {
-                    string elements = arrayToString(attribute.Value);
-                    repeaterData.Add(attribute.Key, elements);
-                }
+            //if (attributes.Count > 0)
+            //{
+            //    Dictionary<string, string> repeaterData = new Dictionary<string, string>();
+            //    foreach (KeyValuePair<string, string[]> attribute in attributes)
+            //    {
+            //        string elements = arrayToString(attribute.Value);
+            //        repeaterData.Add(attribute.Key, elements);
+            //    }
 
-                rptAttributes.DataSource = repeaterData;
-                rptAttributes.DataBind();
+            //    rptAttributes.DataSource = repeaterData;
+            //    rptAttributes.DataBind();
 
-                divLogin.Visible = false;
-                divMain.Visible = true;
-            }
-            else
-            {
-                if (errMessage != "success")
-                {
-                    lblError.Text = errMessage;
-                }
-                else
-                {
-                    lblError.Text = "Invalid username or password";
-                }
-            }
+            //    divLogin.Visible = false;
+            //    divMain.Visible = true;
+            //}
+            //else
+            //{
+            //    if (errMessage != "success")
+            //    {
+            //        lblError.Text = errMessage;
+            //    }
+            //    else
+            //    {
+            //        lblError.Text = "Invalid username or password";
+            //    }
+            //}
         }
 
         private String arrayToString(string[] arr)
